@@ -108,7 +108,12 @@ impl FromSql for time::Tm {
 
 impl ToSql for time::Timespec {
     fn to_sql(&self, s: &mut PreparedStatement, ix: uint) -> SqliteResult<()> {
-        s.bind_text(ix, time::at_utc(*self).strftime(SQLITE_TIME_FMT).as_slice())
+        s.bind_text(ix, time::at_utc(*self)
+                            .strftime(SQLITE_TIME_FMT)
+                            .ok()
+                            .expect("Couldn't format time in SQLITE_TIME_FMT format.")
+                            .as_slice()
+                    )
     }
 }
 
